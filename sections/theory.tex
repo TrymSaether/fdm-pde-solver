@@ -1,4 +1,64 @@
-\chapter{Methodology}
+\chapter{Theory}
+
+\section{Theoretical Background}
+
+\begin{definition}{Local Truncation Error}{lte}
+  The local truncation error (LTE) is the error made at a single grid point when approximating a differential equation with a finite difference scheme.
+  \[
+    \norm{\tau_m^n} = \norm{u(x_m, t_n) - U_m^n} = \mathcal{O}(h^p + k^q) \quad \text{as} \quad h, k \to 0 
+  \]
+  where \(p\) and \(q\) are the order of the spatial and temporal discretizations, respectively.
+\end{definition}
+
+
+\paragraph{Taylor Expansions}
+
+\subparagraph{Spatial Taylor Expansions}
+\begin{align*}
+  u_{m+1}^n & \approx u_m^n + h \partial_x u_m^n + \frac{h^2}{2} \partial_x^2 u_m^n + \frac{h^3}{6} \partial_x^3 u_m^n + \mathcal{O}(h^4) \\
+  u_{m-1}^n & \approx u_m^n - h \partial_x u_m^n + \frac{h^2}{2} \partial_x^2 u_m^n - \frac{h^3}{6} \partial_x^3 u_m^n + \mathcal{O}(h^4) \\
+\end{align*}
+
+\subparagraph{Temporal Taylor Expansions}
+\begin{align*}
+  u_m^{n+1} & \approx u_m^n + k \partial_t u_m^n + \frac{k^2}{2} \partial_t^2 u_m^n + \frac{k^3}{6} \partial_t^3 u_m^n + \mathcal{O}(k^4)                                                                                                            \\
+  u_m^\star & \approx u_m^n + \Phi k \partial_t u_m^n + \frac{(\Phi k)^2}{2} \partial_t^2 u_m^n + \frac{(\Phi k)^3}{6} \partial_t^3 u_m^n + \mathcal{O}(k^4)                                                                                         \\
+            & = u_m^n + \Phi k \left(\mu \partial_x^2 u_m^n + a u_m^n\right) + \frac{(\Phi k)^2}{2} \left(\mu \partial_x^2 \left(\mu \partial_x^2 u_m^n + a u_m^n\right) + a \left(\mu \partial_x^2 u_m^n + a u_m^n\right)\right) + \mathcal{O}(k^4) \\
+\end{align*}
+
+\subparagraph{Spatial and Temporal Taylor Expansion}
+\begin{align*}
+  u_{m+1}^\star & \approx u_m^n + \left(\Phi k \partial_t u_m^n + h \partial_x u_m^n\right) + \frac{1}{2}\left(\Phi^2 k^2 \partial_t^2 u_m^n + h^2 \partial_x^2 u_m^n\right) + \mathcal{O}(h^3 + k^3) \\
+  u_{m-1}^\star & \approx u_m^n + \left(\Phi k \partial_t u_m^n - h \partial_x u_m^n\right) + \frac{1}{2}\left(\Phi^2 k^2 \partial_t^2 u_m^n + h^2 \partial_x^2 u_m^n\right) + \mathcal{O}(h^3 + k^3) \\
+\end{align*}
+
+
+\paragraph{Notation}
+\begin{tabular}{ll}
+  \textbf{Symbol}               & \textbf{Meaning}                       \\
+  \hline                                                                 \\[-1em]
+  \(u = u(x, t)\)               & Exact temperature distribution         \\
+  \(u_m^n = u(x_m, t_n)\)       & Exact temperature at grid point        \\
+  \(\mu\)                       & Diffusion coefficient                  \\
+  \(f(u)\)                      & Reaction term                          \\
+  \(u_0(x)\)                    & Initial temperature distribution       \\
+  \(g(x, t)\)                   & Boundary condition                     \\
+  \(\Omega\)                    & Spatial domain                         \\
+  \(\partial \Omega\)           & Boundary of spatial domain             \\
+  \hline                                                                 \\[-1em]
+  \(U_m^n \approx u(x_m, t_n)\) & Numerical approximation of temperature \\
+  \(x_m = m h\)                 & Spatial grid points                    \\
+  \(t_n = n k\)                 & Temporal grid points                   \\
+  \(h = L/M\)                   & Spatial step size                      \\
+  \(k =T/N\)                    & Temporal step size                     \\
+  \(L\)                         & Spatial domain length                  \\
+  \(T\)                         & Final time                             \\
+  \(M\)                         & Number of spatial grid points          \\
+  \(N\)                         & Number of temporal grid points         \\
+  \(\mathbb{G}\)                & Set of all grid points                 \\
+  \hline
+\end{tabular}
+
 
 \section{The Heat Equation}
 
@@ -232,93 +292,6 @@ It is the difference between the exact solution \(u(x_m, t_n)\) and the numerica
 
 \end{proof}
 
-
-
-
-We denote the exact, and intermediate PDE solution by
-\[
-  u_m^n = u(x_m, t_n), \quad u_m^\star = u(x_m, t_n + \Phi k)
-\]
-Where \(\Phi \in [0, 1]\) is a parameter that interpolates between the time levels \(t_n\) and \(t_{n+1}\).
-
-We want to find the local truncation error (LTE) of the Crank-Nicolson scheme, which is the error at a single grid point when approximating the PDE with the finite difference scheme.
-
-\[
-  \norm{\tau_m^n} = \norm{u(x_m, t_n) - U_m^n} = \mathcal{O}(h^p + k^q) \quad \text{as} \quad h, k \to 0
-\]
-
-Then we substitute these expansions into the finite difference schemes to analyze the local truncation error (LTE):
-
-\begin{align*}
-  \delta_x^2 u_m^n & = u_{m+1}^n - 2 u_m^n + u_{m-1}^n                                                                                                    \\
-                   & = \left[ u_m^n + h \partial_x u_m^n + \frac{h^2}{2} \partial_x^2 u_m^n + \frac{h^3}{6} \partial_x^3 u_m^n + \mathcal{O}(h^4) \right] \\
-                   & - 2 u_m^n                                                                                                                            \\
-                   & + \left[ u_m^n - h \partial_x u_m^n + \frac{h^2}{2} \partial_x^2 u_m^n - \frac{h^3}{6} \partial_x^3 u_m^n + \mathcal{O}(h^4) \right] \\
-                   & = h^2 \partial_x^2 u_m^n + \mathcal{O}(h^4)
-\end{align*}
-
-\begin{align*}
-  \delta_x^2 u_m^\star & = u_{m+1}^\star - 2 u_m^\star + u_{m-1}^\star                                                                                                                                                                                                                                 \\
-                       & = \left[ u_m^n + \left(\Phi k \partial_t u_m^n + h \partial_x u_m^n\right) + \frac{1}{2}\left(\Phi^2 k^2 \partial_t^2 u_m^n + h^2 \partial_x^2 u_m^n\right) + \frac{1}{6}\left(\Phi^3 k^3 \partial_t^3 u_m^n + h^3 \partial_x^3 u_m^n\right) + \mathcal{O}(h^4 + k^4) \right] \\
-                       & - 2 \left[ u_m^n + \Phi k \partial_t u_m^n + \frac{(\Phi k)^2}{2} \partial_t^2 u_m^n + \frac{(\Phi k)^3}{6} \partial_t^3 u_m^n + \mathcal{O}(k^4) \right]                                                                                                                     \\
-                       & + \left[ u_m^n + \left(\Phi k \partial_t u_m^n - h \partial_x u_m^n\right) + \frac{1}{2}\left(\Phi^2 k^2 \partial_t^2 u_m^n + h^2 \partial_x^2 u_m^n\right) + \frac{1}{6}\left(\Phi^3 k^3 \partial_t^3 u_m^n - h^3 \partial_x^3 u_m^n\right) + \mathcal{O}(h^4 + k^4) \right] \\
-                       & = h^2 \partial_x^2 u_m^n + \mathcal{O}(h^4 + k^4)                                                                                                                                                                                                                             \\
-\end{align*}
-
-Then we substitute these expansions into the Crank-Nicolson scheme to analyze the local truncation error (LTE):
-\begin{align*}
-  U_m^\star & = U_m^n + \frac{r}{2} \left( \delta_x^2 U_m^\star + \delta_x^2 U_m^n \right) + k a U_m^n                                  \\
-            & = u_m^n + \frac{r}{2} \left( h^2 \partial_x^2 u_m^n + h^2 \partial_x^2 u_m^n \right) + k a u_m^n + \mathcal{O}(h^4 + k^4) \\
-            & = u_m^n + r h^2 \partial_x^2 u_m^n + k a u_m^n + \mathcal{O}(h^4 + k^4)                                                   \\
-\end{align*}
-
-By substituting the expansions into the Crank-Nicolson scheme, we can analyze the local truncation error (LTE) of the scheme.
-
-\begin{align*}
-  U_m^{n+1} & = U_m^\star + \tfrac{k}{2} \Bigl( a\,U_m^\star - a\,U_m^n \Bigr)                                                                            \\[1mm]
-            & = \Bigl[ u_m^n + k\,\partial_t u_m^n + \tfrac{k^2}{2}\,\partial_t^2 u_m^n + \tfrac{k^3}{6}\,\partial_t^3 u_m^n + \mathcal{O}(k^4) \Bigr]    \\
-            & \quad {}+ \tfrac{k\,a}{2}\Bigl\{ \Bigl[ u_m^n + r\,h^2\,\partial_{xx} u_m^n + k\,a\,u_m^n
-  + \mathcal{O}(h^4+k^2) \Bigr] - u_m^n \Bigr\}                                                                                                           \\[1mm]
-            & = u_m^n + k\,\partial_t u_m^n + \tfrac{k^2}{2}\,\partial_t^2 u_m^n
-  + \tfrac{k^3}{6}\,\partial_t^3 u_m^n + \mathcal{O}(k^4) + \tfrac{k\,a}{2}\Bigl( r\,h^2\,\partial_{xx} u_m^n + k\,a\,u_m^n \Bigr) + \mathcal{O}(h^4+k^4) \\[1mm]
-            & = u_m^n + k\,\partial_t u_m^n + \tfrac{k^2}{2}\,\partial_t^2 u_m^n
-  + \tfrac{k^3}{6}\,\partial_t^3 u_m^n
-  + \tfrac{a\,r\,k}{2}\,h^2\,\partial_{xx} u_m^n + \tfrac{a^2\,k^2}{2}\,u_m^n
-  + \mathcal{O}(k^4+h^4)
-\end{align*}
-
-Using \(r=\frac{\mu k}{h^2}\) so that \(r\,h^2=\mu k\), we rewrite the above as
-\begin{align*}
-  U_m^{n+1} & = u_m^n + k\,\partial_t u_m^n + \tfrac{k^2}{2}\,\partial_t^2 u_m^n
-  + \tfrac{k^3}{6}\,\partial_t^3 u_m^n
-  + \tfrac{a\,\mu\,k^2}{2}\,\partial_{xx} u_m^n + \tfrac{a^2\,k^2}{2}\,u_m^n
-  + \mathcal{O}(k^4+h^4).
-\end{align*}
-
-The left-hand side of the scheme is the exact solution at the next time level:
-\begin{align*}
-  u_m^{n+1}
-   & = u_m^n + k\,\partial_t u_m^n + \tfrac{k^2}{2}\,\partial_t^2 u_m^n
-  + \tfrac{k^3}{6}\,\partial_t^3 u_m^n + \mathcal{O}(k^4).
-\end{align*}
-
-The local truncation error (LTE) is the difference between the exact solution and the numerical approximation:
-
-\begin{align*}
-  U_m^{n+1} - u_m^{n+1} & =
-  \left[ u_m^n + k\,\partial_t u_m^n + \tfrac{k^2}{2}\,\partial_t^2 u_m^n + \tfrac{k^3}{6}\,\partial_t^3 u_m^n + \mathcal{O}(k^4) \right]                                                            \\
-                        & - \left[ u_m^n + k\,\mu\,\partial_{x}^2 u_m^n + k\,a\,u_m^n + \tfrac{a\,\mu\,k^2}{2}\,\partial_{x}^2 u_m^n + \tfrac{a^2\,k^2}{2}\,u_m^n \right] + \mathcal{O}(k^4+h^4)     \\
-                        & = k^2 \left[\tfrac{1}{2}\partial_t^2 u_m^n - \tfrac{a \,\mu}{2}\partial_{x}^2 u_m^n - \tfrac{a^2}{2}u_m^n\right] + \tfrac{k^3}{6}\partial_t^3 u_m^n + \mathcal{O}(k^4+h^4) \\
-                        & = \mathcal{O}(k^2 + h^4)                                                                                                                                                   \\[2mm]
-  \norm{\tau_m^n}       & = \norm{\frac{U_m^{n+1} - u_m^{n+1}}{k}} = \mathcal{O}(k + \frac{h^4}{k})                                                                                                  \\
-\end{align*}
-
-If we choose time step \(k\) such that \(k \sim h^2\) is of similar order as the spatial step, then the LTE is a second-order error in both time and space:
-
-\begin{equation}
-  \norm{\tau_m^n} = \mathcal{O}(k + \frac{h^4}{k}) \approx \mathcal{O}(k^2 + h^2) \quad \text{where} \quad k \sim h^2
-\end{equation}
-
 \subsection{Stability Analysis (Von Neumann Stability)}
 The Von Neumann stability analysis is a method to determine the stability of a finite difference scheme by analyzing the growth of errors in the Fourier modes of the solution.
 
@@ -369,7 +342,7 @@ The Von Neumann stability analysis is a method to determine the stability of a f
   Furthermore, we can now find a bound for the amplification factor:
 
   \begin{align*}
-     \norm*{\xi} &= \norm*{
+    \norm*{\xi} & = \norm*{
       -\frac{\alpha^2 + 2(\alpha + 1)(\sigma + 1)}
       {2(\sigma - 1)}}
     \leq
@@ -390,23 +363,27 @@ The Von Neumann stability analysis is a method to determine the stability of a f
         \leq 1
       }
     }
-    {2\underbrace{\abs{\sigma - 1}}_{\geq 1}} 
+    {2\underbrace{\abs{\sigma - 1}}_{\geq 1}}
     \leq
     \frac{
       \alpha^2
       + \alpha + 1
-      }{2}
-    \leq 1 \\                                 
+    }{2}
+    \leq 1                  \\
     \frac{\alpha^2 + \alpha - 1}{2}
-    &\leq 0
+                & \leq 0
     \Rightarrow
     \alpha_{1,2}
     =
     \frac{-1 \pm \sqrt{5}}{2}
-    \approx -1.618, \. 0.618
+    \approx -1.618, 0.618
     \Rightarrow
     \alpha \leq 0.618
   \end{align*}
+
 \end{proof}
+
+
+
 
 
