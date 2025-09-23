@@ -50,16 +50,6 @@ The script shows the initial infection map and a 3D animation of the infected fr
 
 Edit the `Heat` object configuration near the bottom of the file to reproduce the experiments discussed in the report and call `python simulation/theory.py` to launch the plots/animations.
 
-## Rebuilding the Report
-The report relies on `latexmk` and `biber`. Rebuild it with:
-
-```bash
-latexmk -pdf main.tex
-biber main
-latexmk -pdf main.tex
-```
-
-Adjust the bibliography run (`biber main`) to `bibtex` if you swap backends. Outputs are written to the project root; clean auxiliary files with `latexmk -c` when needed.
 
 ## Tips
 - Animations can be saved by replacing `plt.show()` with `FuncAnimation.save` calls (Matplotlib provides `ffmpeg`/`imagemagick` writers).
