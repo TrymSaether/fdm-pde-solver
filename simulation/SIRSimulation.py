@@ -29,15 +29,15 @@ class SIRSimulation:
 
         self.initial_condition()
         self.S -= self.I
-        
+
         self.L_matrix = self.laplacian()
-    
+
     def initial_condition(self):
         if self.n == 0:  #Dense infection in corners
             dist_to_corner = (self.X - self.L / 4)**2 + (self.Y - self.L / 4)**2
             infection = (self.ii * np.exp(-200 * dist_to_corner)).ravel()
             self.I = infection + infection[::-1]
-            
+
         elif self.n == 1:  #Linear front of infection
             self.I[self.X.ravel() < self.L * 0.2] = self.ii
 
@@ -56,7 +56,7 @@ class SIRSimulation:
 
         L = diags([off, diag, off], [-1, 0, 1], shape=(self.M, self.M), format='csr') / self.h**2
         I = eye(self.M, format='csr')
-        
+
         return kron(I, L) + kron(L, I)
 
     def beta_function(self, t):
@@ -64,7 +64,7 @@ class SIRSimulation:
             time_factor = 1 + 0.1 * np.sin(t-2)  # Fluctuates with time
         else:
             return self.beta
-        
+
         dist_to_center = (self.X - self.L / 2)**2 + (self.Y - self.L / 2)**2
         spatial_factor = 1 + 0.5 * np.exp(-100 * dist_to_center)  # Higher in center
 
@@ -101,27 +101,27 @@ class SIRSimulation:
         fig = plt.figure(figsize=(8, 6))
         ax = fig.add_subplot(111, projection='3d')
         surf = [None]
-        
+
         def update(frame):
             t = frame * self.dt * 50  # Compute current time
             if t >= 10:  # Stop condition
                 anim.event_source.stop()
                 return
-            
-            for _ in range(50): 
+
+            for _ in range(50):
                 self.step(t)  # Stops updating once t > 10
-            
+
             if surf[0] is not None:
                 surf[0].remove()
-            
+
             surf[0] = ax.plot_surface(self.X, self.Y, self.I.reshape(self.M, self.M), cmap='hot', edgecolor='none')
             ax.set_zlim(0, 1)
             ax.set_title(f'Infected Population at t={t:.2f}')
             ax.set_xlabel('x')
             ax.set_ylabel('y')
             ax.set_zlabel('Infected Fraction')
-        
-        anim = FuncAnimation(fig, update, frames=int(min(self.Nt//50, 10 / (self.dt * 50))), interval=10) 
+
+        anim = FuncAnimation(fig, update, frames=int(min(self.Nt//50, 10 / (self.dt * 50))), interval=10)
         plt.show()
 
 
